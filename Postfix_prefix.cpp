@@ -20,7 +20,35 @@ bool isOperand(const char& symbol) {
 bool isOperator (const char& symbol) {
     return symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/' || symbol == '^';
 }
+bool isAvailableInput(const string& input) {
+    //Check double **, //, ^^
+    for(size_t i = 0; i < input.size()-2; i++) {
+        if(input[i] == '*' && input[i+1] == '*') { cout << "undefined error\n";return false;}
+        if(input[i] == '/' && input[i+1] == '/') { cout << "undefined error\n";return false;}
+        if(input[i] == '^' && input[i+1] == '^') { cout << "undefined error\n";return false;}
+        if(input[i] == '*' && input[i+1] == '/') { cout << "undefined error\n";return false;}
+        if(input[i] == '*' && input[i+1] == '^') { cout << "undefined error\n";return false;}
+        if(input[i] == '/' && input[i+1] == '*') { cout << "undefined error\n";return false;}
+        if(input[i] == '/' && input[i+1] == '^') { cout << "undefined error\n";return false;}
+        if(input[i] == '^' && input[i+1] == '*') { cout << "undefined error\n";return false;}
+        if(input[i] == '^' && input[i+1] == '/') { cout << "undefined error\n";return false;}
+    }
+    //Floating point
+    for(size_t i = 0; i < input.size()-2; i++) {
+        if(input[i] == '.' && input[i+1] == '.') { cout << "syntax error\n";return false;}
+        if(input[i] == '.' && isOperator(input[i+1])) { cout << "syntax error\n";return false;}
+    }
+    //Parenthesis
+    for(size_t i = 0; i < input.size()-3; i++) {
+        if(isOperand(input[i])&&input[i+1] == '('&&input[i+2] != ')') { cout << "syntax error\n";return false;}
+        if(isOperator(input[i])&&input[i+1] == ')'&&input[i+2] == '(') { cout << "syntax error\n";return false;}
+    }
+    return true;
+}
 string Infix2Postfix(const string& infix_notation) {
+    if(!isAvailableInput(infix_notation)) {
+        return "";
+    }
     stack <string> newStack;
     string postfix_notation;
     for (size_t i = 0; i < infix_notation.size(); i++) {
@@ -66,6 +94,9 @@ string Infix2Postfix(const string& infix_notation) {
     return postfix_notation;
 }
 string Infix2Prefix(string infix_notation){
+    if(!isAvailableInput(infix_notation)) {
+        return "";
+    }
     stack <string> newStack;
     string prefix_notation;
     reverse(infix_notation.begin(),infix_notation.end());
