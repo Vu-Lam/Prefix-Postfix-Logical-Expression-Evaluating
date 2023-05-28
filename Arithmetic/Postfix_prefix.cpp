@@ -64,7 +64,8 @@ string Infix2Postfix(const string& infix_notation) {
             symbol =  infix_notation[i];
         }
         if(symbol == '(') {
-            newStack.emplace("(");
+            string openBracket = "(";
+            newStack.push(openBracket);
         }
         if(symbol == ')') {
             while (!newStack.empty() && newStack.top()!="(") {
@@ -82,7 +83,8 @@ string Infix2Postfix(const string& infix_notation) {
                 postfix_notation+=" ";
                 newStack.pop();
             }
-            newStack.emplace(1, symbol);
+            string str_symbol(1,symbol);
+            newStack.push( str_symbol);
         }
     }
     while (!newStack.empty()) {
@@ -100,11 +102,10 @@ string Infix2Prefix(string infix_notation){
     stack <string> newStack;
     string prefix_notation;
     reverse(infix_notation.begin(),infix_notation.end());
-//    cout << "After reverse: " << infix_notation << endl;
+    cout << "After reverse: " << infix_notation << endl;
     size_t length = infix_notation.size();
     for(std::size_t i = 0; i < length; i++) {
-        char symbol = infix_notation[i];
-        if(isOperand(symbol)) {
+        if(isOperand(infix_notation[i])) {
             string stringNumber;
             while (isOperand(infix_notation[i]) && i < infix_notation.size()) {
                 stringNumber += string(1,infix_notation[i]);
@@ -112,45 +113,55 @@ string Infix2Prefix(string infix_notation){
             }
             stringNumber += " ";
             prefix_notation += stringNumber;
-            symbol =  infix_notation[i];
         }
-        if(symbol == ')') {
-            newStack.emplace("(");
-        }
-        if(symbol == '(') {
-            while (!newStack.empty() && newStack.top()!="(") {
-                prefix_notation+=newStack.top();
-                prefix_notation+=" ";
-                newStack.pop();
+        if(i < infix_notation.size()) {
+            char symbol = infix_notation[i];
+//            if(symbol== ' ') continue;
+            if(symbol == ')') {
+                string openBracket = "(";
+                newStack.push(openBracket);
             }
-            if (!newStack.empty() && newStack.top() == "(") {
-                newStack.pop();
-            }
-        }
-        if(isOperator(symbol)) {
-            if(newStack.empty())
-                newStack.emplace(1, symbol);
-            else if (preference(symbol) > preference(newStack.top()[0])) {
-                newStack.emplace(1, symbol);
-            }
-            else if (preference(symbol) == preference(newStack.top()[0]) && symbol == '^') {
-                while (preference(symbol) == preference(newStack.top()[0]) && symbol == '^') {
-                    prefix_notation += newStack.top();
-                    prefix_notation +=" ";
+            if(symbol == '(') {
+                while (!newStack.empty() && newStack.top()!="(") {
+                    prefix_notation+=newStack.top();
+                    prefix_notation+=" ";
                     newStack.pop();
                 }
-                newStack.emplace(1,symbol);
-            }
-            else if (preference(symbol) == preference((newStack.top()[0]))) {
-                newStack.emplace(1,symbol);
-            }
-            else if (preference(symbol) < preference(newStack.top()[0])) {
-                while (!newStack.empty() && preference(symbol) < preference(newStack.top()[0]) ) {
-                    prefix_notation += newStack.top();
-                    prefix_notation +=" ";
+                if (!newStack.empty() && newStack.top() == "(") {
                     newStack.pop();
                 }
-                newStack.emplace(1,symbol);
+            }
+            if(isOperator(symbol)) {
+                if(newStack.empty()) {
+                    string str_symbol(1,symbol);
+                    newStack.push( str_symbol);
+                }
+                else if (!newStack.empty() && preference(symbol) > preference(newStack.top()[0])) {
+                    string str_symbol(1,symbol);
+                    newStack.push( str_symbol);
+                }
+                else if (!newStack.empty() && preference(symbol) == preference(newStack.top()[0]) && symbol == '^') {
+                    while (!newStack.empty() && preference(symbol) == preference(newStack.top()[0]) && symbol == '^') {
+                        prefix_notation += newStack.top();
+                        prefix_notation +=" ";
+                        newStack.pop();
+                    }
+                    string str_symbol(1,symbol);
+                    newStack.push( str_symbol);
+                }
+                else if (!newStack.empty() && preference(symbol) == preference((newStack.top()[0]))) {
+                    string str_symbol(1,symbol);
+                    newStack.push( str_symbol);
+                }
+                else if (!newStack.empty() && preference(symbol) < preference(newStack.top()[0])) {
+                    while (!newStack.empty() && preference(symbol) < preference(newStack.top()[0]) ) {
+                        prefix_notation += newStack.top();
+                        prefix_notation +=" ";
+                        newStack.pop();
+                    }
+                    string str_symbol(1,symbol);
+                    newStack.push( str_symbol);
+                }
             }
         }
     }
@@ -167,7 +178,7 @@ string PostfixPrefixCalculator(const string& expression) {
     stack <double> newStack;
     // postfix evaluating
     if (isOperand(expression[0])) {
-        for(size_t i = 0; i < expression.size(); i++) {
+        for(int i = 0; i < (int)expression.size(); i++) {
             char symbol = expression[i];
             if(symbol == ' ') continue;
             if(isOperand(symbol)) {
@@ -208,7 +219,7 @@ string PostfixPrefixCalculator(const string& expression) {
             if(symbol == ' ') continue;
             if(isOperand(symbol)) {
                 string stringNumber;
-                while (isOperand(expression[i]) && i < expression.size()) {
+                while (isOperand(expression[i]) && i < (int)expression.size()) {
                     stringNumber += string(1,expression[i]);
                     i--;
                 }
