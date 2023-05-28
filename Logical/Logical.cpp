@@ -14,14 +14,14 @@ bool isAvailableLogic(const string& input) {
 bool isLogicOperand(const string& input) {
     return ("a" <= input && input <= "z") || ("A" <= input && input <= "Z");
 }
-int preference(const string& symbol) {
+int preferenceLogic(const string& symbol) {
     if(symbol == "~") return 4;
     if(symbol == "&" || symbol == "|") return 3;
     if(symbol == "->") return 2;
     if(symbol == "<->") return 1;
     else return 0;
 }
-bool isOperator(const string & symbol) {
+bool isOperatorLogic(const string & symbol) {
     return symbol == "~" || symbol == "&" || symbol == "|" || symbol == "->" || symbol == "<->";
 }
 string LogicInfix2Postfix(const string& infix_notation) {
@@ -51,8 +51,8 @@ string LogicInfix2Postfix(const string& infix_notation) {
         if(!isLogicOperand(symbol)) {
             if(symbol == "-") {symbol = "->"; i++;}
             if(symbol == "<") {symbol = "<->"; i+=2;}
-            if(isOperator(symbol)) {
-                while (!newStack.empty() && preference(newStack.top()) >= preference(symbol)) {
+            if(isOperatorLogic(symbol)) {
+                while (!newStack.empty() && preferenceLogic(newStack.top()) >= preferenceLogic(symbol)) {
                     postfix_notation+=newStack.top();
                     newStack.pop();
                 }
@@ -107,25 +107,25 @@ string LogicInfix2Prefix(string infix_notation) {
         if(!isLogicOperand(symbol)) {
             if(symbol == "-") {symbol = "->"; i++;}
             if(symbol == "<") {symbol = "<->"; i+=2;}
-            if(isOperator(symbol)) {
+            if(isOperatorLogic(symbol)) {
                 if(newStack.empty()) {
                     newStack.push(symbol);
                 }
-                else if(preference(symbol) > preference(newStack.top())) {
+                else if(preferenceLogic(symbol) > preferenceLogic(newStack.top())) {
                     newStack.push(symbol);
                 }
-                else if (preference(symbol) == preference(newStack.top()) && symbol == "~") {
-                    while(preference(symbol) == preference(newStack.top()) && symbol == "~") {
+                else if (preferenceLogic(symbol) == preferenceLogic(newStack.top()) && symbol == "~") {
+                    while(preferenceLogic(symbol) == preferenceLogic(newStack.top()) && symbol == "~") {
                         prefix_notation+=newStack.top();
                         newStack.pop();
                     }
                     newStack.push(symbol);
                 }
-                else if (preference(symbol) == preference(newStack.top())) {
+                else if (preferenceLogic(symbol) == preferenceLogic(newStack.top())) {
                     newStack.push(symbol);
                 }
-                else if (preference(symbol) < preference(newStack.top())) {
-                    while (!newStack.empty() && preference(symbol) < preference(newStack.top())) {
+                else if (preferenceLogic(symbol) < preferenceLogic(newStack.top())) {
+                    while (!newStack.empty() && preferenceLogic(symbol) < preferenceLogic(newStack.top())) {
                         prefix_notation+=newStack.top();
                         newStack.pop();
                     }
@@ -192,7 +192,7 @@ string LogicPostfixPrefixCalculator(string expression, const string& value) {
     if(firstSymbol == "-") firstSymbol = "->";
     if(firstSymbol == "<") firstSymbol = "<->";
     //Postfix calculate
-    if(!isOperator(firstSymbol)) {
+    if(!isOperatorLogic(firstSymbol)) {
         for(size_t i = 0; i < expression.size(); i++) {
             string symbol(1,expression[i]);
             if(symbol == "0") {
@@ -203,7 +203,7 @@ string LogicPostfixPrefixCalculator(string expression, const string& value) {
             }
             if(symbol == "<") { symbol = "<->"; i+=2;}
             if(symbol == "-") { symbol = "->"; i++;}
-            if(isOperator(symbol)) {
+            if(isOperatorLogic(symbol)) {
                if(symbol == "~") {
                    if(operands_stack.empty()) return "FALSE";
                    bool operand =  operands_stack.top();
@@ -246,7 +246,7 @@ string LogicPostfixPrefixCalculator(string expression, const string& value) {
         }
     }
     //Prefix calculate
-    else if(isOperator(firstSymbol)) {
+    else if(isOperatorLogic(firstSymbol)) {
         //change direction of implication from -> to <-
         if(expression[0] == '-' && expression[1] == '>') {
             expression[0] = '<';
